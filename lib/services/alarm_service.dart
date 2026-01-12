@@ -9,14 +9,20 @@ final alarmProvider = StateNotifierProvider<AlarmService, List<Alarm>>((ref) {
 });
 
 class AlarmService extends StateNotifier<List<Alarm>> {
-  final NotificationService _notificationService = NotificationService();
+  late final NotificationService _notificationService;
   
   // Method channel for communicating with Android native code
   static const platform = MethodChannel('com.novaclock/alarms');
 
   AlarmService() : super([]) {
-    _loadAlarms();
-    _initializeNativeAlarmSystem();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    _notificationService = NotificationService();
+    await _notificationService.init();
+    await _loadAlarms();
+    await _initializeNativeAlarmSystem();
   }
 
   static const _alarmsKey = 'alarms';
@@ -55,91 +61,112 @@ class AlarmService extends StateNotifier<List<Alarm>> {
   /// This dual approach ensures reliability:
   /// - Android AlarmManager: Reliable even if app is closed or device reboots
   /// - Flutter notifications: Fallback if native fails, provides UI feedback
-  void _scheduleAlarmNatively(Alarm alarm) {
+  Future<void> _scheduleAlarmNatively(Alarm alarm) async {
     try {
       // Schedule with native Android AlarmManager
-      platform.invokeMethod('scheduleAlarm', {
-        'alarmId': alarm.id.hashCode, // Use hashCode as unique ID
+      final result = await platform.invokeMethod('scheduleAlarm', {
+        'alarmId': alarm.id.hashCode,
         'triggerAtMillis': alarm.time.millisecondsSinceEpoch,
       });
+      print('✅ Native alarm scheduled: $result');
     } catch (e) {
-      print('Failed to schedule native alarm: $e');
+      print('❌ Failed to schedule native alarm: $e');
     }
 
     // Also schedule with Flutter notifications as fallback
-    _notificationService.scheduleNotification(
-      alarm.id.hashCode,
-      'Nova Clock Alarm',
-      'Time to wake up!',
-      alarm.time,
-    );
+    try {
+      await _notificationService.scheduleNotification(
+        alarm.id.hashCode,
+        'Nova Clock Alarm',
+        'Time to wake up!',
+        alarm.time,
+      );
+      print('✅ Notification scheduled for alarm: ${alarm.id}');
+    } catch (e) {
+      print('❌ Failed to schedule notification: $e');
+    }
   }
 
   /// Cancel alarm both natively and in Flutter
-  void _cancelAlarmNatively(Alarm alarm) {
+  Future<void> _cancelAlarmNatively(Alarm alarm) async {
     try {
-      platform.invokeMethod('cancelAlarm', {
+      await platform.invokeMethod('cancelAlarm', {
         'alarmId': alarm.id.hashCode,
       });
+      print('✅ Native alarm cancelled: ${alarm.id}');
     } catch (e) {
-      print('Failed to cancel native alarm: $e');
+      print('❌ Failed to cancel native alarm: $e');
     }
 
-    _notificationService.cancelNotification(alarm.id.hashCode);
+    try {
+      await _notificationService.cancelNotification(alarm.id.hashCode);
+      print('✅ Notification cancelled: ${alarm.id}');
+    } catch (e) {
+      print('❌ Failed to cancel notification: $e');
+    }
   }
 
   /// Add a new alarm
-  void addAlarm(DateTime time) {
+  Future<void> addAlarm(DateTime time) async {
     final newAlarm = Alarm(id: DateTime.now().toString(), time: time);
     state = [...state, newAlarm];
-    _saveAlarms();
-    _scheduleAlarmNatively(newAlarm);
+    await _saveAlarms();
+    await _scheduleAlarmNatively(newAlarm);
+    print('➕ New alarm added: ${newAlarm.id} at ${newAlarm.time}');
   }
 
   /// Toggle alarm on/off
-  void toggleAlarm(String id) {
-    final alarmToToggle = state.firstWhere(
-      (alarm) => alarm.id == id,
-      orElse: () => throw Exception('Alarm with id $id not found'),
-    );
-    final updatedAlarm = alarmToToggle.copyWith(isActive: !alarmToToggle.isActive);
+  Future<void> toggleAlarm(String id) async {
+    try {
+      final alarmToToggle = state.firstWhere(
+        (alarm) => alarm.id == id,
+        orElse: () => throw Exception('Alarm with id $id not found'),
+      );
+      final updatedAlarm = alarmToToggle.copyWith(isActive: !alarmToToggle.isActive);
 
-    state = [
-      for (final alarm in state)
-        if (alarm.id == id)
-          updatedAlarm
-        else
-          alarm,
-    ];
-    _saveAlarms();
+      state = [
+        for (final alarm in state)
+          if (alarm.id == id)
+            updatedAlarm
+          else
+            alarm,
+      ];
+      await _saveAlarms();
 
-    if (updatedAlarm.isActive) {
-      _scheduleAlarmNatively(updatedAlarm);
-    } else {
-      _cancelAlarmNatively(updatedAlarm);
+      if (updatedAlarm.isActive) {
+        await _scheduleAlarmNatively(updatedAlarm);
+        print('🔔 Alarm enabled: $id');
+      } else {
+        await _cancelAlarmNatively(updatedAlarm);
+        print('🔕 Alarm disabled: $id');
+      }
+    } catch (e) {
+      print('❌ Error toggling alarm: $e');
+      rethrow;
     }
   }
 
   /// Remove an alarm
-  void removeAlarm(String id) {
+  Future<void> removeAlarm(String id) async {
     try {
       final alarmToRemove = state.firstWhere((alarm) => alarm.id == id);
-      _cancelAlarmNatively(alarmToRemove);
+      await _cancelAlarmNatively(alarmToRemove);
     } catch (e) {
-      // Alarm not found, do nothing
+      print('⚠️  Alarm not found, skipping cancel: $id');
     }
     state = state.where((alarm) => alarm.id != id).toList();
-    _saveAlarms();
+    await _saveAlarms();
+    print('🗑️  Alarm removed: $id');
   }
 
   /// Snooze an active alarm by specified minutes
   /// Reschedules the alarm to trigger X minutes from now
-  void snoozeAlarm(String id, int minutes) {
+  Future<void> snoozeAlarm(String id, int minutes) async {
     try {
       final alarmToSnooze = state.firstWhere((alarm) => alarm.id == id);
       final snoozeTime = DateTime.now().add(Duration(minutes: minutes));
       final snoozedAlarm = alarmToSnooze.copyWith(time: snoozeTime);
-      
+
       // Update state
       state = [
         for (final alarm in state)
@@ -148,14 +175,14 @@ class AlarmService extends StateNotifier<List<Alarm>> {
           else
             alarm,
       ];
-      _saveAlarms();
-      
+      await _saveAlarms();
+
       // Reschedule
-      _scheduleAlarmNatively(snoozedAlarm);
+      await _scheduleAlarmNatively(snoozedAlarm);
+      print('⏰ Alarm snoozed: $id for $minutes minutes');
     } catch (e) {
-      print('Failed to snooze alarm: $e');
-    }
-  }
+      print('❌ Failed to snooze alarm: $e');
+      rethrow;
 
   /// Check alarm permission status (Android 12+)
   /// Returns a message if permissions are missing

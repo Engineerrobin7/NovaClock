@@ -4,6 +4,7 @@ import 'package:nova_clock/screens/main_screen.dart';
 import 'package:nova_clock/screens/welcome_screen.dart';
 import 'package:nova_clock/services/auth_service.dart';
 import 'package:nova_clock/services/notification_service.dart';
+import 'package:nova_clock/services/settings_service.dart';
 import 'package:nova_clock/utils/theme.dart';
 
 final notificationServiceProvider = Provider((ref) => NotificationService());
@@ -19,20 +20,18 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Load auth state
+    // Watch auth state
     final authState = ref.watch(authProvider);
+    
+    // Watch settings state for theme changes
+    final settingsState = ref.watch(settingsProvider);
     
     return MaterialApp(
       title: 'Nova Clock',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light().copyWith(
-        colorScheme: AppTheme.darkTheme.colorScheme.copyWith(
-          brightness: Brightness.light,
-        ),
-        textTheme: AppTheme.darkTheme.textTheme,
-      ),
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      theme: AppTheme.buildLightTheme(accentColorIndex: settingsState.accentColorIndex),
+      darkTheme: AppTheme.buildDarkTheme(accentColorIndex: settingsState.accentColorIndex),
+      themeMode: settingsState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: authState.isAuthenticated 
           ? const MainScreen() 
           : const WelcomeScreen(),
