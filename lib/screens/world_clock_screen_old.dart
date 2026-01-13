@@ -32,7 +32,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
   void _addTimezone() async {
     final newTimezone = await Navigator.push(
       context,
-      CustomPageRoute(builder: (context) => const AddTimezoneScreen()),
+      CustomPageRoute(builder: (context, _, __) => const AddTimezoneScreen()),
     );
 
     if (newTimezone != null && !_timezones.contains(newTimezone)) {
@@ -99,7 +99,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
                         const SizedBox(height: 4),
                         Text(
                           formattedDate,
-                          style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.6)),
+                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.6)),
                         ),
                       ],
                     ),

@@ -51,7 +51,6 @@ class AppTheme {
         primary: primaryColor,
         secondary: secondaryColor,
         surface: _darkCardColor,
-        background: _darkBackgroundColor,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -62,36 +61,36 @@ class AppTheme {
           ),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           elevation: 8,
-          shadowColor: primaryColor.withOpacity(0.5),
+          shadowColor: primaryColor.withValues(alpha: 0.5),
         ),
       ),
       cardTheme: CardThemeData(
-        color: _darkCardColor.withOpacity(0.7),
+        color: _darkCardColor.withValues(alpha: 0.7),
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: _darkTextColor.withOpacity(0.1), width: 1),
+          side: BorderSide(color: _darkTextColor.withValues(alpha: 0.1), width: 1),
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.transparent,
         selectedItemColor: primaryColor,
-        unselectedItemColor: _darkTextColor.withOpacity(0.5),
+        unselectedItemColor: _darkTextColor.withValues(alpha: 0.5),
         showUnselectedLabels: false,
         elevation: 0,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return primaryColor;
           }
           return Colors.grey;
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return primaryColor.withOpacity(0.5);
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryColor.withValues(alpha: 0.5);
           }
-          return Colors.grey.withOpacity(0.3);
+          return Colors.grey.withValues(alpha: 0.3);
         }),
       ),
     );
@@ -117,7 +116,6 @@ class AppTheme {
         primary: primaryColor,
         secondary: secondaryColor,
         surface: _lightCardColor,
-        background: _lightBackgroundColor,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -128,7 +126,7 @@ class AppTheme {
           ),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           elevation: 4,
-          shadowColor: primaryColor.withOpacity(0.3),
+          shadowColor: primaryColor.withValues(alpha: 0.3),
         ),
       ),
       cardTheme: CardThemeData(
@@ -136,7 +134,7 @@ class AppTheme {
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: Colors.grey.withOpacity(0.2), width: 1),
+          side: BorderSide(color: Colors.grey.withValues(alpha: 0.2), width: 1),
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -147,17 +145,17 @@ class AppTheme {
         elevation: 8,
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return primaryColor;
           }
           return Colors.grey;
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return primaryColor.withOpacity(0.5);
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryColor.withValues(alpha: 0.5);
           }
-          return Colors.grey.withOpacity(0.3);
+          return Colors.grey.withValues(alpha: 0.3);
         }),
       ),
     );

@@ -183,6 +183,8 @@ class AlarmService extends StateNotifier<List<Alarm>> {
     } catch (e) {
       print('❌ Failed to snooze alarm: $e');
       rethrow;
+    }
+  }
 
   /// Check alarm permission status (Android 12+)
   /// Returns a message if permissions are missing

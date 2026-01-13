@@ -42,13 +42,13 @@ class _AlarmScreenState extends ConsumerState<AlarmScreen> {
                     Icon(
                       Icons.alarm_off_outlined,
                       size: 64,
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'No alarms set',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                           ),
                     ),
                   ],
@@ -115,7 +115,7 @@ class _AlarmScreenState extends ConsumerState<AlarmScreen> {
                                   .textTheme
                                   .bodyMedium
                                   ?.copyWith(
-                                    color: Colors.white.withOpacity(0.7),
+                                    color: Colors.white.withValues(alpha: 0.7),
                                     fontStyle: FontStyle.italic,
                                   ),
                             )
@@ -126,7 +126,7 @@ class _AlarmScreenState extends ConsumerState<AlarmScreen> {
                                   .textTheme
                                   .bodyMedium
                                   ?.copyWith(
-                                    color: Colors.white.withOpacity(0.4),
+                                    color: Colors.white.withValues(alpha: 0.4),
                                   ),
                             ),
                         ],

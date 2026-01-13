@@ -25,7 +25,7 @@ class _WorldClockScreenState extends ConsumerState<WorldClockScreen> {
   void _addTimezone() async {
     final newTimezone = await Navigator.push(
       context,
-      CustomPageRoute(builder: (context) => const AddTimezoneScreen()),
+      CustomPageRoute(builder: (context, _, __) => const AddTimezoneScreen()),
     );
 
     if (newTimezone != null) {
@@ -100,7 +100,7 @@ class _WorldClockScreenState extends ConsumerState<WorldClockScreen> {
                         Icon(
                           Icons.public_off,
                           size: 64,
-                          color: Theme.of(context).primaryColor.withOpacity(0.5),
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -151,7 +151,7 @@ class _WorldClockScreenState extends ConsumerState<WorldClockScreen> {
                                         formattedDate,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: Colors.white.withOpacity(0.6),
+                                          color: Colors.white.withValues(alpha: 0.6),
                                         ),
                                       ),
                                     ],
@@ -206,7 +206,7 @@ class _WorldClockScreenState extends ConsumerState<WorldClockScreen> {
                                       'Invalid timezone',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.red.withOpacity(0.7),
+                                        color: Colors.red.withValues(alpha: 0.7),
                                       ),
                                     ),
                                   ],
