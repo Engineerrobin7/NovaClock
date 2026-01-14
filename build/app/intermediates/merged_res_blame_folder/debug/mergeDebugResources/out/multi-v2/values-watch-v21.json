@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.novaclock.nova_clock.app-mergeDebugResources-41:/values-watch-v21/values-watch-v21.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\ROBIN\\.gradle\\caches\\8.13\\transforms\\3f29a5d8fb2dc216752e59e094e97bbf\\transformed\\appcompat-1.1.0\\res\\values-watch-v21\\values-watch-v21.xml",
+                    "from": {
+                        "startLines": "2,6,10",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,271,499",
+                        "endLines": "5,9,13",
+                        "endColumns": "12,12,12",
+                        "endOffsets": "266,494,724"
+                    }
+                }
+            ]
+        }
+    ]
+}
