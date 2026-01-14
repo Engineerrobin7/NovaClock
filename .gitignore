@@ -65,3 +65,9 @@ migrate_working_dir/
 .env
 .env.local
 .env.*.local
+
+
+# Flutter build outputs
+build/
+*.apk
+*.so
